@@ -1,0 +1,17 @@
+.sql
+.mdf
+.xml
+.zip
+.rar
+.bak
+.backup
+.save
+.tar
+.tar.gz
+.txt
+_bak
+_sql
+.war
+_1
+.beifen
+.7z
