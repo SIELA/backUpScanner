@@ -11,16 +11,19 @@ No need for delay and use only one thread for one target
 
 '''
 
+import signal
 import argparse
 import requests
 import IPy
 import threading
 import time
-
+from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED
 print("#### Backup files scanner ####")
 
-threads = []
+threadsnum = 3
+ctrlcstop = False
 verbose = True
+delay = 0
 targets = []
 suffixes = []
 file_names = []
@@ -35,16 +38,21 @@ group = parser.add_mutually_exclusive_group()
 group.required = True
 group.add_argument('--target', '-T', help = 'Single target')
 group.add_argument('--targetsfile', '-M', help = 'Targets file')
-#parser.add_argument('--threads', '-t', help = 'Set threads', default = 3)
+parser.add_argument('--threads', '-t', help = 'Set threads num', default = 3)
 parser.add_argument('--verbose', '-v', help = 'Set verbose level', default = 1)
+parser.add_argument('--delay', '-d', help = 'Set delay time', type = int, default = 0)
 
-args = parser.parse_args(['-M', 'targets.txt','-v', '1'])
+args = parser.parse_args(['-M','targets.txt','-v','0','-d','1','-t','5'])
+#args = parser.parse_args()
 
 #set threads and delay
-#threads = args.threads
-#delay = args.delay
+threads = args.threads
+delay = args.delay
+
 if args.verbose == 0:
     verbose = False
+else:
+    verbose = True
     
 #get targets
 if args.target != None:
@@ -94,6 +102,7 @@ def detect(url):
     if verbose != False:
         print("[Scanning]: "+url)
     try:
+        time.sleep(delay)
         r = requests.head('http://'+url)
         if r.status_code == 200:
             return url
@@ -119,31 +128,19 @@ def get_result(target):
         if rs != False:
             out.write(rs)
             print("[Detected]: "+rs)
- 
+
 out = open(out_file, 'w')
-   
-# thread
-class myThread(threading.Thread):
-    def __init__(self, func, args=()):
-        super(myThread, self).__init__()
-        self.func = func
-        self.args = args
 
-    def run(self):
-        self.func(*self.args)
-
+#main
 combine_urls()
+executor = ThreadPoolExecutor(max_workers=threadsnum)
 
-for target in targets:
-    mt = myThread(get_result,((target),))
-    mt.setDaemon(True)
-    mt.start()
-    threads.append(mt)
+try:
+    #我这是写了个屎，还是找大佬帮忙把
+except KeyboardInterrupt as e:
+    print("Stop by keyboard.")
 
-for t in threads:
-    t.join()
-
-
+print("\nScan end. Result saved to "+out_file)
 out.close()
 
 

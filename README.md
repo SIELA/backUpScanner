@@ -5,8 +5,8 @@ Backup file scanner
 用法：  
 <code>git clone https://github.com/SIELA/backUpScanner  </code>  
 <code>cd backUpScanner</code>  
-<code>python ./backUpScanner -v 1 -h www.baidu.com</code>单个扫描    
-<code>python ./backUpScanner -v 1 -H targetfile.txt</code>批量扫描 
+<code>python ./backUpScanner -v 1 -h www.baidu.com -t 3</code>3线程单个扫描    
+<code>python ./backUpScanner -v 1 -H targetfile.txt -t 3 -d 5</code>批量扫描 每个目标发包延时5秒
 
 ./suffixes.txt里面是要扫描的后缀  
 ./filenames.txt里面是要扫描的文件名  
@@ -17,5 +17,5 @@ www.baidu.com--->
 scan:www.baidu.com/baidu.sql.....     
 scan:www.baidu.com/baidu.bak.....      
 ....     
-源码比较简(la)单(ji)，可以自己修改加入线程、队列、延时功能
+源码比较简(la)单(ji)，可以自己定制
 
